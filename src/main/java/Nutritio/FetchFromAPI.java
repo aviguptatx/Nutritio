@@ -17,9 +17,6 @@ class FetchFromAPI {
 
     public String getRecipeData(ArrayList<String> ingredients) throws Exception {
 
-        //Proper url format below
-        //"https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/findByIngredients?fillIngredients=false&ingredients=apples%2Cflour%2Csugar&limitLicense=false&number=3&ranking=1";
-//            final String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=5&ranking=1&ignorePantry=false&ingredients=apples%252Cflour%252Csugar";
         final String tail = "&limitLicense=false&number=3&ranking=1";
         String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=5&ranking=1&ignorePantry=false&ingredients=";
 
@@ -28,16 +25,15 @@ class FetchFromAPI {
             base += ingredient + "%252C";
         }
 
-        // chop off final "%25C" -- not needed
+        // chop off final "%25C" - not needed
         base = base.substring(0, base.length() - 5);
-
-        System.out.println(base);
 
         StringBuilder recStrBldr = new StringBuilder("");
         String seperator = "%2C";
         int numIngredients = ingredients.size();
         int lastIngredient = numIngredients - 1;
-        //Build the ingredientString based on the above url format using %2C for seperators
+        
+        // Build the ingredientString based on the above url format using %2C for separators
         for (int k = 0; k < numIngredients; k++) {
             String curIng = ingredients.get(k);
             curIng = curIng.replaceAll("[\\n\\t ]", "");
@@ -56,7 +52,7 @@ class FetchFromAPI {
         // optional default is GET
         con.setRequestMethod("GET");
 
-        //add request header
+        // add request header
         con.setRequestProperty("x-rapidapi-host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
         con.setRequestProperty("x-rapidapi-key", APIKey);
 
@@ -85,7 +81,6 @@ class FetchFromAPI {
 
     public String getIngredients(int id) throws Exception {
 
-        // https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/{id}/ingredientWidget.json
         final String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/";
         final String tail = "/ingredientWidget.json";
         String url = base + Integer.toString(id) + tail;
@@ -96,7 +91,7 @@ class FetchFromAPI {
         // optional default is GET
         con.setRequestMethod("GET");
 
-        //add request header
+        // add request header
         con.setRequestProperty("x-rapidapi-host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
 
         con.setRequestProperty("x-rapidapi-key", APIKey);
@@ -126,8 +121,6 @@ class FetchFromAPI {
 
     private String getInstructions(String recipeId) throws Exception {
 
-        // Proper url format listed below.
-        //"https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/479101/information?includeNutrition=false"
         String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=5&ranking=1&ignorePantry=false&ingredients=apples%252Cflour%252Csugar";
         String Id = recipeId;
         String tail = "/information?includeNutrition=false";
