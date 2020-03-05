@@ -2,13 +2,15 @@ package Nutritio;
 
 import java.util.ArrayList;
 
-class Recipe implements Comparable {
+class Recipe {
 
+    private String id;
     private String name;
     private ArrayList<Ingredient> ingredients;
     private String imageURL;
 
-    public Recipe(String name, ArrayList<Ingredient> ingredients, String imageURL) {
+    public Recipe(String id, String name, ArrayList<Ingredient> ingredients, String imageURL) {
+        this.id = id;
         this.name = name;
         this.ingredients = ingredients;
         this.imageURL = imageURL;
@@ -28,13 +30,7 @@ class Recipe implements Comparable {
 
     @Override
     public String toString() {
-        return name;
+        return "ID: " + id + " " + name + " ingredient list: " + ingredients;
     }
 
-    @Override
-    public int compareTo(Object oth) {
-        Recipe other = (Recipe) oth;
-        return name.compareTo(other.getName());
-    }
-    
 }

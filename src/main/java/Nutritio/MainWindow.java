@@ -20,13 +20,13 @@ import javax.swing.table.DefaultTableModel;
 
 public class MainWindow extends javax.swing.JFrame {
 
-    private PrintWriter pw;
-    private Set<Recipe> recipes;
+    private ArrayList<Recipe> recipes;
+    private ArrayList<String> ids;
 
     public MainWindow() {
         initComponents();
-        pw = null;
-        recipes = new HashSet();
+        recipes = new ArrayList();
+        ids = new ArrayList();
     }
 
     /**
@@ -126,38 +126,79 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_ingredientInputActionPerformed
 
     private void generateRecipesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateRecipesActionPerformed
+
+        // prevents results from previous queries from populating the table
+        recipes.clear();
+
+        FetchFromAPI http = new FetchFromAPI();
+
         ArrayList<String> ingredients = getIngredientList();
 
-        PrintWriter pw = null;
+        PrintWriter recipePrinter = null;
+        PrintWriter rawPrinter = null;
+        PrintWriter idPrinter = null;
+        String rawData = null;
 
+        // creating PrintWriters
         try {
-            pw = new PrintWriter(new FileWriter(new File("output.nut")));
+            rawPrinter = new PrintWriter(new FileWriter(new File("rawData.nut")));
+        } catch (IOException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            recipePrinter = new PrintWriter(new FileWriter(new File("recipes.nut")));
+        } catch (IOException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            idPrinter = new PrintWriter(new FileWriter(new File("ids.nut")));
         } catch (IOException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        FetchFromAPI http = new FetchFromAPI();
-
-        String rawData = null;
+        // getting raw data from api
         try {
             rawData = http.getRecipeData(ingredients);
         } catch (Exception ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        // Test print to show recipes ArrayList is being populated and its contents are accessible        
         String[] rawRecipes = rawData.split("title");
-
+        String[] rawIds = rawData.split(",\"title\".*?\\d+.,.\"id\":");
+        
+        // compiling id list
+        for (int i = 0; i < rawIds.length; i++) {
+            if (i == 0) {
+                ids.add(rawIds[0].substring(7));
+            } else if (i == rawIds.length - 1) {
+                ids.add(rawIds[rawIds.length - 1].substring(0, 6));
+            } else {
+                ids.add(rawIds[i]);
+            }
+        }
+        
+        // parsing raw data and adding to recipes list
         for (int i = 1; i < rawRecipes.length; i++) {
             String recipeName = (rawRecipes[i].split("\",\"")[0]).substring(3);
             String imageURL = rawRecipes[i].split("\",\"")[1].split("\":\"")[1];
-            recipes.add(new Recipe(recipeName, new ArrayList<Ingredient>(), imageURL));
+            recipes.add(new Recipe(ids.get(i-1), recipeName, new ArrayList<Ingredient>(), imageURL));
         }
 
+        System.out.println(recipes);
+//        // print out raw data, recipes and ids
+//        rawPrinter.print(rawData);
+//
 //        for (String recipe : rawRecipes) {
-//            pw.print(recipe + "\n\n\n\n\n");
+//            recipePrinter.print(recipe + "\n\n");
 //        }
-//        pw.close();
+//        for (String id : rawIds) {
+//            idPrinter.print(id + "\n\n");
+//        }
+//
+//        recipePrinter.close();
+//        rawPrinter.close();
+//        idPrinter.close();
+
         displayRecipes();
     }//GEN-LAST:event_generateRecipesActionPerformed
 
@@ -177,19 +218,20 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void displayRecipes() {
         DefaultTableModel model = (DefaultTableModel) recipeTable.getModel();
-        
+
         // allows images to be rendered in second column of the table
         recipeTable.getColumnModel().getColumn(1).setCellRenderer(recipeTable.getDefaultRenderer(ImageIcon.class));
-        
+
         // makes the rows tall enough to display images
         recipeTable.setRowHeight(200);
-        
+
         // sets header font
         recipeTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 30));
-        
+
         // sets table font
         recipeTable.setFont(new Font("Arial", Font.PLAIN, 20));
-        
+
+        // clears the table
         model.setRowCount(0);
 
         for (Recipe r : recipes) {

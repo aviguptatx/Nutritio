@@ -79,11 +79,11 @@ class FetchFromAPI {
         return resultString;
     }
 
-    public String getIngredients(int id) throws Exception {
+    public String getIngredients(String id) throws Exception {
 
         final String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/";
         final String tail = "/ingredientWidget.json";
-        String url = base + Integer.toString(id) + tail;
+        String url = base + id + tail;
 
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -119,7 +119,7 @@ class FetchFromAPI {
         return resultString;
     }
 
-    private String getInstructions(String recipeId) throws Exception {
+    public String getInstructions(String recipeId) throws Exception {
 
         String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=5&ranking=1&ignorePantry=false&ingredients=apples%252Cflour%252Csugar";
         String Id = recipeId;
