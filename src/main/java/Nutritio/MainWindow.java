@@ -1,5 +1,6 @@
 package Nutritio;
 
+import java.awt.Font;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -98,13 +99,11 @@ public class MainWindow extends javax.swing.JFrame {
         RecipeListPanel.setLayout(RecipeListPanelLayout);
         RecipeListPanelLayout.setHorizontalGroup(
             RecipeListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(RecipeListPanelLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 200, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
         );
         RecipeListPanelLayout.setVerticalGroup(
             RecipeListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
 
         Tabs.addTab("Recipe List", RecipeListPanel);
@@ -124,7 +123,6 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ingredientInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ingredientInputActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_ingredientInputActionPerformed
 
     private void generateRecipesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateRecipesActionPerformed
@@ -179,7 +177,19 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void displayRecipes() {
         DefaultTableModel model = (DefaultTableModel) recipeTable.getModel();
-
+        
+        // allows images to be rendered in second column of the table
+        recipeTable.getColumnModel().getColumn(1).setCellRenderer(recipeTable.getDefaultRenderer(ImageIcon.class));
+        
+        // makes the rows tall enough to display images
+        recipeTable.setRowHeight(200);
+        
+        // sets header font
+        recipeTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 30));
+        
+        // sets table font
+        recipeTable.setFont(new Font("Arial", Font.PLAIN, 20));
+        
         model.setRowCount(0);
 
         for (Recipe r : recipes) {
