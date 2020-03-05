@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 class FetchFromAPI {
@@ -29,10 +30,10 @@ class FetchFromAPI {
         base = base.substring(0, base.length() - 5);
 
         StringBuilder recStrBldr = new StringBuilder("");
-        String seperator = "%2C";
+        String separator = "%2C";
         int numIngredients = ingredients.size();
         int lastIngredient = numIngredients - 1;
-        
+
         // Build the ingredientString based on the above url format using %2C for separators
         for (int k = 0; k < numIngredients; k++) {
             String curIng = ingredients.get(k);
@@ -40,7 +41,7 @@ class FetchFromAPI {
             recStrBldr.append(curIng);
 
             if (k != lastIngredient) {
-                recStrBldr.append(seperator);
+                recStrBldr.append(separator);
             }
         }
 
@@ -93,7 +94,6 @@ class FetchFromAPI {
 
         // add request header
         con.setRequestProperty("x-rapidapi-host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
-
         con.setRequestProperty("x-rapidapi-key", APIKey);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -119,12 +119,11 @@ class FetchFromAPI {
         return resultString;
     }
 
-    public String getInstructions(String recipeId) throws Exception {
+    public String[] getInstructions(String recipeId) throws Exception {
 
-        String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=5&ranking=1&ignorePantry=false&ingredients=apples%252Cflour%252Csugar";
-        String Id = recipeId;
-        String tail = "/information?includeNutrition=false";
-        String url = base + Id + tail;
+        String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/";
+        String tail = "/analyzedInstructions?stepBreakdown=false";
+        String url = base + recipeId + tail;
 
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -157,13 +156,21 @@ class FetchFromAPI {
             }
         }
         String resultString = sb.toString();
-        String instructions = "None Found";
 
-        String[] parsed = resultString.split(Pattern.quote("instructions"));
-        for (int i = 0; i < parsed.length - 1; i++) {
-            String target[] = parsed[1].replaceAll("\"", "").split(Pattern.quote(",analyzedInstructions"));
-            instructions = target[0].replace(":", "");
+//        System.out.println(resultString);
+
+        String[] parsed = resultString.split(".+?step\":\"");
+        String rawInstructions = parsed[1].split("ingredients\"")[0].split("\",\"")[0];
+        
+        String[] instructions = rawInstructions.split("\\.");
+        
+        String output = "";
+        
+        for (int i = 0; i < instructions.length; i++) {
+            instructions[i] = instructions[i].trim();
         }
+                
         return instructions;
     }
+    
 }

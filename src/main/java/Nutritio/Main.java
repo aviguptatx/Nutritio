@@ -15,6 +15,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         MainWindow GUI = new MainWindow();
         GUI.setVisible(true);
+        FetchFromAPI http = new FetchFromAPI();
     }
 
 }

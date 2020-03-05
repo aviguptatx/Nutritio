@@ -1,5 +1,6 @@
 package Nutritio;
 
+import java.awt.Component;
 import java.awt.Font;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,9 +15,9 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 public class MainWindow extends javax.swing.JFrame {
 
@@ -90,9 +91,17 @@ public class MainWindow extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Name", "Image"
+                "Name", "Ingredients", "Instructions", "Image"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Object.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(recipeTable);
 
         javax.swing.GroupLayout RecipeListPanelLayout = new javax.swing.GroupLayout(RecipeListPanel);
@@ -165,7 +174,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         String[] rawRecipes = rawData.split("title");
         String[] rawIds = rawData.split(",\"title\".*?\\d+.,.\"id\":");
-        
+
         // compiling id list
         for (int i = 0; i < rawIds.length; i++) {
             if (i == 0) {
@@ -176,15 +185,18 @@ public class MainWindow extends javax.swing.JFrame {
                 ids.add(rawIds[i]);
             }
         }
-        
+
         // parsing raw data and adding to recipes list
         for (int i = 1; i < rawRecipes.length; i++) {
             String recipeName = (rawRecipes[i].split("\",\"")[0]).substring(3);
             String imageURL = rawRecipes[i].split("\",\"")[1].split("\":\"")[1];
-            recipes.add(new Recipe(ids.get(i-1), recipeName, new ArrayList<Ingredient>(), imageURL));
+            try {
+                recipes.add(new Recipe(ids.get(i - 1), recipeName, new ArrayList<Ingredient>(), http.getInstructions(ids.get(i - 1)), imageURL));
+            } catch (Exception ex) {
+                Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
-        System.out.println(recipes);
 //        // print out raw data, recipes and ids
 //        rawPrinter.print(rawData);
 //
@@ -198,7 +210,6 @@ public class MainWindow extends javax.swing.JFrame {
 //        recipePrinter.close();
 //        rawPrinter.close();
 //        idPrinter.close();
-
         displayRecipes();
     }//GEN-LAST:event_generateRecipesActionPerformed
 
@@ -219,8 +230,13 @@ public class MainWindow extends javax.swing.JFrame {
     private void displayRecipes() {
         DefaultTableModel model = (DefaultTableModel) recipeTable.getModel();
 
-        // allows images to be rendered in second column of the table
-        recipeTable.getColumnModel().getColumn(1).setCellRenderer(recipeTable.getDefaultRenderer(ImageIcon.class));
+        MultiLineTableCellRenderer renderer = new MultiLineTableCellRenderer();
+
+        // allows String[] to be rendered in the instructions column of the table
+        recipeTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
+
+        // allows images to be rendered in the image column of the table
+        recipeTable.getColumnModel().getColumn(3).setCellRenderer(recipeTable.getDefaultRenderer(ImageIcon.class));
 
         // makes the rows tall enough to display images
         recipeTable.setRowHeight(200);
@@ -229,21 +245,27 @@ public class MainWindow extends javax.swing.JFrame {
         recipeTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 30));
 
         // sets table font
-        recipeTable.setFont(new Font("Arial", Font.PLAIN, 20));
+        recipeTable.setFont(new Font("Arial", Font.PLAIN, 12));
 
         // clears the table
         model.setRowCount(0);
 
         for (Recipe r : recipes) {
-            Object[] data = new Object[2];
+            System.out.println(Arrays.toString(r.getInstructions()));
+        }
+        
+        for (Recipe r : recipes) {
+            Object[] data = new Object[4];
             data[0] = r.getName();
+            data[1] = r.getIngredients();
+            data[2] = r.getInstructions();
             Icon temp = null;
             try {
                 temp = new ImageIcon(new URL(r.getImageURL()));
             } catch (MalformedURLException ex) {
                 Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
             }
-            data[1] = temp;
+            data[3] = temp;
             model.addRow(data);
         }
     }
@@ -281,6 +303,18 @@ public class MainWindow extends javax.swing.JFrame {
                 new MainWindow().setVisible(true);
             }
         });
+    }
+
+    public class MultiLineTableCellRenderer extends JList<String> implements TableCellRenderer {
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+            if (value instanceof String[]) {
+                setListData((String[]) value);
+            }
+            return this;
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
