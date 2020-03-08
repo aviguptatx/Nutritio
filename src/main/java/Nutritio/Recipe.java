@@ -6,15 +6,13 @@ class Recipe {
 
     private String id;
     private String name;
-    private ArrayList<Ingredient> ingredients;
-    private String[] instructions;
+    private String url;
     private String imageURL;
 
-    public Recipe(String id, String name, ArrayList<Ingredient> ingredients, String[] instructions, String imageURL) {
+    public Recipe(String id, String name, String url, String imageURL) {
         this.id = id;
         this.name = name;
-        this.ingredients = ingredients;
-        this.instructions = instructions;
+        this.url = url;
         this.imageURL = imageURL;
     }
 
@@ -26,10 +24,6 @@ class Recipe {
         return name;
     }
 
-    public ArrayList<Ingredient> getIngredients() {
-        return ingredients;
-    }
-
     public String getId() {
         return id;
     }
@@ -38,17 +32,17 @@ class Recipe {
         this.id = id;
     }
 
-    public String[] getInstructions() {
-        return instructions;
+    public String getUrl() {
+        return url;
     }
 
-    public void setInstructions(String[] instructions) {
-        this.instructions = instructions;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Override
     public String toString() {
-        return "ID: " + id + " " + name + " ingredient list: " + ingredients;
+        return "";
     }
 
 }

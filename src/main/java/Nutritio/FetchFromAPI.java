@@ -80,49 +80,10 @@ class FetchFromAPI {
         return resultString;
     }
 
-    public String getIngredients(String id) throws Exception {
-
-        final String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/";
-        final String tail = "/ingredientWidget.json";
-        String url = base + id + tail;
-
-        URL obj = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-        // optional default is GET
-        con.setRequestMethod("GET");
-
-        // add request header
-        con.setRequestProperty("x-rapidapi-host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
-        con.setRequestProperty("x-rapidapi-key", APIKey);
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-
-        String line;
-        StringBuffer response = new StringBuffer();
-
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        String resultString = sb.toString();
-        return resultString;
-    }
-
-    public String[] getInstructions(String recipeId) throws Exception {
+    public String getURL(String recipeId) throws Exception {
 
         String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/";
-        String tail = "/analyzedInstructions?stepBreakdown=false";
+        String tail = "/information";
         String url = base + recipeId + tail;
 
         URL obj = new URL(url);
@@ -157,20 +118,11 @@ class FetchFromAPI {
         }
         String resultString = sb.toString();
 
-//        System.out.println(resultString);
+        String[] parsed = resultString.split("dairyFree");
+        String recipeURL = "";
 
-        String[] parsed = resultString.split(".+?step\":\"");
-        String rawInstructions = parsed[1].split("ingredients\"")[0].split("\",\"")[0];
-        
-        String[] instructions = rawInstructions.split("\\.");
-        
-        String output = "";
-        
-        for (int i = 0; i < instructions.length; i++) {
-            instructions[i] = instructions[i].trim();
-        }
-                
-        return instructions;
+        recipeURL = parsed[1].split("\"sourceUrl\":\"")[1].split("\"")[0].trim();
+
+        return recipeURL;
     }
-    
 }
