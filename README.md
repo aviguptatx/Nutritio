@@ -16,7 +16,7 @@ private String APIKey = "";
 
 ## Demo
 
-![Demo GIF ](https://media.giphy.com/media/lOOWbbwPBBU6zpp0et/giphy.gif)
+![Demo GIF ](https://media.giphy.com/media/ZB8KVmmIq7VARabPEY/giphy.gif)
 
 ## Contributing
 
