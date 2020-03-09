@@ -31,6 +31,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     public MainWindow() {
         initComponents();
+        ingredientInput.setFont(new Font("Serif", Font.PLAIN, 23));
         recipes = new ArrayList();
         ids = new ArrayList();
     }
@@ -54,7 +55,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        generateRecipes.setText("Generate Recipes");
+        generateRecipes.setText("Generate");
         generateRecipes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 generateRecipesActionPerformed(evt);
@@ -74,19 +75,19 @@ public class MainWindow extends javax.swing.JFrame {
             HomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(HomePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(ingredientInput, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                .addComponent(ingredientInput, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(generateRecipes)
-                .addContainerGap())
+                .addComponent(generateRecipes, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(16, 16, 16))
         );
         HomePanelLayout.setVerticalGroup(
             HomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(HomePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(HomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ingredientInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(generateRecipes))
-                .addContainerGap(269, Short.MAX_VALUE))
+                .addGroup(HomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(generateRecipes, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
+                    .addComponent(ingredientInput))
+                .addContainerGap(238, Short.MAX_VALUE))
         );
 
         Tabs.addTab("Home", HomePanel);
@@ -122,7 +123,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(Tabs)
+            .addComponent(Tabs, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         pack();
@@ -140,27 +141,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         ArrayList<String> ingredients = getIngredientList();
 
-        PrintWriter recipePrinter = null;
-        PrintWriter rawPrinter = null;
-        PrintWriter idPrinter = null;
         String rawData = null;
-
-        // creating PrintWriters
-        try {
-            rawPrinter = new PrintWriter(new FileWriter(new File("rawData.nut")));
-        } catch (IOException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            recipePrinter = new PrintWriter(new FileWriter(new File("recipes.nut")));
-        } catch (IOException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            idPrinter = new PrintWriter(new FileWriter(new File("ids.nut")));
-        } catch (IOException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
         // getting raw data from api
         try {
@@ -193,20 +174,6 @@ public class MainWindow extends javax.swing.JFrame {
                 Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
-        // print out raw data, recipes and ids
-        rawPrinter.print(rawData);
-
-        for (String recipe : rawRecipes) {
-            recipePrinter.print(recipe + "\n\n");
-        }
-        for (String id : rawIds) {
-            idPrinter.print(id + "\n\n");
-        }
-
-        recipePrinter.close();
-        rawPrinter.close();
-        idPrinter.close();
 
         displayRecipes();
     }//GEN-LAST:event_generateRecipesActionPerformed
@@ -280,7 +247,7 @@ public class MainWindow extends javax.swing.JFrame {
             data[2] = temp;
             model.addRow(data);
         }
-        
+
         // switch to recipes tab after the recipes are generated
         Tabs.setSelectedIndex(1);
     }

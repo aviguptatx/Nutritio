@@ -14,6 +14,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         MainWindow GUI = new MainWindow();
+        GUI.setExtendedState(GUI.MAXIMIZED_BOTH);
         GUI.setVisible(true);
         FetchFromAPI http = new FetchFromAPI();
     }
