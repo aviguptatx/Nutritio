@@ -14,11 +14,9 @@ git clone https://github.com/aviguptatx/Nutritio
 private String APIKey = "";
 ```
 
-## Meta
+## Demo
 
-Avi Gupta – aviguptatx@gmail.com
-
-[https://github.com/aviguptatx](https://github.com/aviguptatx)
+![Demo GIF ](https://media.giphy.com/media/lOOWbbwPBBU6zpp0et/giphy.gif)
 
 ## Contributing
 
@@ -26,4 +24,4 @@ Avi Gupta – aviguptatx@gmail.com
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
-5. Create a new Pull Request
+5. Create a new pull request
