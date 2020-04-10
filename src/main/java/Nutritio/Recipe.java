@@ -1,8 +1,9 @@
 package Nutritio;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-class Recipe {
+class Recipe implements Serializable{
 
     private String id;
     private String name;

@@ -4,6 +4,7 @@ import java.awt.List;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -11,10 +12,10 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-class FetchFromAPI {
+class FetchFromAPI implements Serializable{
 
     // Insert API Key from RapidAPI
-    private String APIKey = PrivateAPIKey.getRapidAPIKey();
+    private String APIKey = "4cd95267d7msh1881429e21bbdc2p189331jsn752ab4378397";
 
     public String getRecipeData(ArrayList<String> ingredients) throws Exception {
 
@@ -84,7 +85,7 @@ class FetchFromAPI {
 
         String base = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/";
         String tail = "/information";
-        String url = base + recipeId + tail;
+        String url = base + recipeId.substring(0,recipeId.length()-1) + tail;
 
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();

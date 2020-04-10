@@ -1,6 +1,8 @@
 package Nutritio;
 
-class Ingredient implements Comparable {
+import java.io.Serializable;
+
+class Ingredient implements Comparable,Serializable {
 
     private String name;
     private String amount;
