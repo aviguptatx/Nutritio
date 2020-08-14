@@ -6,8 +6,13 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -29,11 +34,15 @@ public class MainWindow extends javax.swing.JFrame {
     private ArrayList<Recipe> recipes;
     private ArrayList<String> ids;
 
+    private ArrayList<SimModel> results;
+    private File currentFile;
+
     public MainWindow() {
         initComponents();
         ingredientInput.setFont(new Font("Serif", Font.PLAIN, 23));
         recipes = new ArrayList();
         ids = new ArrayList();
+        results = new ArrayList();
     }
 
     /**
@@ -45,6 +54,7 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenu3 = new javax.swing.JMenu();
         Tabs = new javax.swing.JTabbedPane();
         HomePanel = new javax.swing.JPanel();
         generateRecipes = new javax.swing.JButton();
@@ -52,6 +62,13 @@ public class MainWindow extends javax.swing.JFrame {
         RecipeListPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         recipeTable = new javax.swing.JTable();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        save = new javax.swing.JMenuItem();
+        SaveAs = new javax.swing.JMenuItem();
+        open = new javax.swing.JMenuItem();
+
+        jMenu3.setText("jMenu3");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -75,7 +92,7 @@ public class MainWindow extends javax.swing.JFrame {
             HomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(HomePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(ingredientInput, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+                .addComponent(ingredientInput, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(generateRecipes, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(16, 16, 16))
@@ -84,10 +101,10 @@ public class MainWindow extends javax.swing.JFrame {
             HomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(HomePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(HomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(generateRecipes, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
+                .addGroup(HomePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(generateRecipes, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ingredientInput))
-                .addContainerGap(238, Short.MAX_VALUE))
+                .addContainerGap(220, Short.MAX_VALUE))
         );
 
         Tabs.addTab("Home", HomePanel);
@@ -110,10 +127,40 @@ public class MainWindow extends javax.swing.JFrame {
         );
         RecipeListPanelLayout.setVerticalGroup(
             RecipeListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
         );
 
         Tabs.addTab("Recipe List", RecipeListPanel);
+
+        jMenu1.setText("File");
+
+        save.setText("Save");
+        save.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveActionPerformed(evt);
+            }
+        });
+        jMenu1.add(save);
+
+        SaveAs.setText("Save As");
+        SaveAs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveAsActionPerformed(evt);
+            }
+        });
+        jMenu1.add(SaveAs);
+
+        open.setText("Open");
+        open.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openActionPerformed(evt);
+            }
+        });
+        jMenu1.add(open);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -168,15 +215,98 @@ public class MainWindow extends javax.swing.JFrame {
         for (int i = 1; i < rawRecipes.length; i++) {
             String recipeName = (rawRecipes[i].split("\",\"")[0]).substring(3);
             String imageURL = rawRecipes[i].split("\",\"")[1].split("\":\"")[1];
+            System.out.println(imageURL);
             try {
                 recipes.add(new Recipe(ids.get(i - 1), recipeName, http.getURL(ids.get(i - 1)), imageURL));
             } catch (Exception ex) {
                 Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        results.add(new SimModel(recipes,ids));
 
         displayRecipes();
     }//GEN-LAST:event_generateRecipesActionPerformed
+
+    private void writeModelToFile(File file) {
+        try {
+            
+                FileOutputStream fos = new FileOutputStream(file);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                oos.writeObject(results);
+                currentFile = file;
+                oos.close();
+                //menuItem_save.se();
+            
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "ERROR: File not found", "ok beast 2", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "ERROR: No permission", "ok beast 2", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveActionPerformed
+        // TODO add your handling code here:
+        
+        if (currentFile == null) {
+            SaveAsActionPerformed(evt);
+        }
+        else{
+            writeModelToFile(currentFile);   
+            //jMenuItem_save.setEnabled(false);
+        }
+        
+        
+    }//GEN-LAST:event_saveActionPerformed
+
+    
+    private void SaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveAsActionPerformed
+        // TODO add your handling code here:
+        JFileChooser jfc = new JFileChooser();
+
+        jfc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
+        if (jfc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            writeModelToFile(jfc.getSelectedFile()); 
+        }
+        
+        
+    }//GEN-LAST:event_SaveAsActionPerformed
+
+    private void openActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openActionPerformed
+        // TODO add your handling code here:
+        
+        try {
+            // TODO add your handling code here:
+            JFileChooser jfc = new JFileChooser();
+            jfc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+            
+            if(jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                FileInputStream fis  = new FileInputStream(jfc.getSelectedFile());
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                //jSpinner_viewSim.setValue(1);
+                
+                results = (ArrayList)ois.readObject();
+                
+                SimModel model = results.get(0); 
+
+                recipes = model.getRecipes();
+
+                displayRecipes();
+            }
+   
+        } catch (FileNotFoundException ex) {
+            //Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "ERROR: File not found", "ok beast 2", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            //Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "ERROR: File not found", "ok beast 2", JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            //Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "ERROR: File not found", "ok beast 2", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_openActionPerformed
 
     private ArrayList<String> getIngredientList() {
         ArrayList<String> ingredientList = new ArrayList();
@@ -238,10 +368,10 @@ public class MainWindow extends javax.swing.JFrame {
             Object[] data = new Object[3];
             data[0] = r.getName();
             data[1] = r.getUrl();
-            Icon temp = null;
+            ImageIcon temp = null;
             try {
                 temp = new ImageIcon(new URL(r.getImageURL()));
-            } catch (MalformedURLException ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
             }
             data[2] = temp;
@@ -301,10 +431,16 @@ public class MainWindow extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel HomePanel;
     private javax.swing.JPanel RecipeListPanel;
+    private javax.swing.JMenuItem SaveAs;
     private javax.swing.JTabbedPane Tabs;
     private javax.swing.JButton generateRecipes;
     private javax.swing.JTextField ingredientInput;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JMenuItem open;
     private javax.swing.JTable recipeTable;
+    private javax.swing.JMenuItem save;
     // End of variables declaration//GEN-END:variables
 }
